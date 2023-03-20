@@ -1,0 +1,13 @@
+.dk-dosi-profile-container {
+    font-size: 2rem;
+}
+
+.dk-dosi-profile-container a {
+    text-decoration: underline;
+    color: darkblue;
+}
+
+#dk-dosi-profile-table {
+    width: 800px;
+    max-width: 100%;
+}

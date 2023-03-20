@@ -1,0 +1,47 @@
+{
+    "name": "DOSI extension by DK",
+    "version": "0.0.2.4",
+    "description": "Description",
+    "manifest_version": 3,
+    "options_page": "html/options.html",
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_popup": "html/popup.html",
+        "default_title": "DOSI extension by DK",
+        "default_icon": {
+            "16": "res/images/logo-16.png",
+            "32": "res/images/logo-32.png",
+            "48": "res/images/logo-48.png",
+            "128": "res/images/logo-128.png"
+        }
+    },
+    "icons": {
+        "16": "res/images/logo-16.png",
+        "32": "res/images/logo-32.png",
+        "48": "res/images/logo-48.png",
+        "128": "res/images/logo-128.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+              "http://citizen.store.dosi.world/*profile/*",
+              "https://citizen.store.dosi.world/*profile/*"
+            ],
+            "css": [
+                "css/contentStyle.css"
+            ],
+            "js": [
+                "js/jquery.js",
+                "js/contentScript.js"
+            ],
+            "all_frames": true,
+            "run_at": "document_end"
+        }
+    ],
+    "permissions": [
+        "tabs"
+    ],
+    "author": "dekkeng"
+}

@@ -1,0 +1,15 @@
+body {
+    width: 100%;
+    padding: 10px;
+}
+
+.popup_dk_floor_price_table {
+    border-color: gray;
+}
+.popup_dk_floor_price_table th{
+    text-align: center;
+}
+
+.popup_dk_floor_price_table td{
+    min-width: 150px;
+}
