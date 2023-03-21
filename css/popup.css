@@ -13,3 +13,10 @@ body {
 .popup_dk_floor_price_table td{
     min-width: 150px;
 }
+
+.option_button {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+}

@@ -9,8 +9,22 @@
   const tabs = cxt.chrome.tabs;
   const runtime = cxt.chrome.runtime;
   const storage = cxt.chrome.storage;
+  const sync = storage.sync;
+  let options = {};
+  
+  async function get_options() {
+    return new Promise(function(resolve, reject) {
+        sync.get('dk_dosi_options', function(opt) {
+          console.log(opt['dk_dosi_options'])
+          if('dk_dosi_options' in opt) {
+            resolve(opt['dk_dosi_options']);
+          } else {
+            resolve({})
+          }
+        });
+    });
+  }
 
-  //const local = storage.local;
   async function get_token_price() {  
     let req = "https://api.coingecko.com/api/v3/simple/price?ids=link%2Cethereum&vs_currencies=usd";
   
@@ -59,7 +73,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
         "price": 0,
         "totalItems": 0
     };
-    let str = '',url ='';
+    let str = '',url ='',currency='';
     switch (filter) {
         case 'dosi_lv1':
             str = "propertyIds=947&"
@@ -81,7 +95,22 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
             str = filter
             break;
     }
-    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&nftOrder="+order;
+    
+    if('check_currency' in options) {
+      switch (options['check_currency']) {
+          case 'ln':
+          case 'eth':
+              currency = "currency="+options['check_currency'].toUpperCase()+"&"
+              data.currency = options['check_currency'].toUpperCase()
+              break;  
+          default:
+          case 'all':
+              currency = ""
+              break;
+      }
+    }
+
+    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
     
     return new Promise(function(resolve, reject) { $.ajax({
           url: req,
@@ -100,10 +129,6 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
     });
 }
 
-function pad(width, string, padding) { 
-  return (width <= string.length) ? string : pad(width, padding + string, padding)
-}
-
 async function gen_floor_price_text(type, token_price, name = "") {
     let floor = await get_floor_price(type);
     let price_usd = convert_price_usd(floor, token_price);
@@ -115,7 +140,10 @@ async function gen_floor_price_text(type, token_price, name = "") {
 }
 
 async function generate_dosi_report() {    
+  options = await get_options();
   let token_price = await get_token_price();
+
+  if('check_currency' in options) $(".popup_dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase());
     
   gen_floor_price_text("dosi_lv1", token_price, "DOSI LV1");
   gen_floor_price_text("dosi_lv2", token_price, "DOSI LV2");
@@ -125,6 +153,14 @@ async function generate_dosi_report() {
 }
 
   $(() => {
+    $('.option_button').click(function() {
+      if (chrome.runtime.openOptionsPage) {
+        chrome.runtime.openOptionsPage();
+      } else {
+        window.open(chrome.runtime.getURL('html/options.html'));
+      }
+    });
+
     generate_dosi_report();
   });
 /*

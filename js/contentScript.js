@@ -8,8 +8,8 @@
   const $ = cxt.$;  
   const profile_container = "#__next > main > div > div > div > div > div.chakra-stack > div";
   const loading_image = "<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' />";
-  //const storage = cxt.chrome.storage;
-   const runtime = cxt.chrome.runtime;
+  const storage = cxt.chrome.storage;
+  const runtime = cxt.chrome.runtime;
    
    let total_value = 0;
   // const commands = cxt.chrome.commands;
@@ -18,8 +18,41 @@
   // const contextMenus = cxt.chrome.contextMenus;
   // const action = cxt.chrome.action;
 
-  //const local = storage.local; // use local.set() and local.get()
+  const sync = storage.sync;
 
+  let options = {};
+
+  async function get_options() {
+    return new Promise(function(resolve, reject) {
+        sync.get('dk_dosi_options', function(opt) {
+          console.log(opt['dk_dosi_options'])
+          if('dk_dosi_options' in opt) {
+            resolve(opt['dk_dosi_options']);
+          } else {
+            resolve({})
+          }
+        });
+    });
+  }
+
+  async function get_token_price() {  
+    let req = "https://api.coingecko.com/api/v3/simple/price?ids=link%2Cethereum&vs_currencies=usd";
+  
+    let data = {};
+    
+    return new Promise(function(resolve, reject) { $.ajax({
+          url: req,
+          type: "GET",
+          crossDomain: true,
+          dataType: "json",
+          success: function(res) {
+              //console.log(res)
+              data = res;
+              resolve(data)
+          }
+      });
+    });
+  }
 
   async function get_dosi_nfts(id, type = 'collections') {
     let condition = {
@@ -55,7 +88,6 @@
   return data;
 }
 
-  //const local = storage.local;
   async function get_token_price() {  
     let req = "https://api.coingecko.com/api/v3/simple/price?ids=link%2Cethereum&vs_currencies=usd";
   
@@ -108,7 +140,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
         "price": 0,
         "totalItems": 0
     };
-    let str = '',url ='';
+    let str = '',url ='',currency='';
     switch (filter) {
         case 'dosi_lv1':
             str = "propertyIds=947&"
@@ -130,15 +162,28 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
             str = filter
             break;
     }
-    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&nftOrder="+order;
+
+    if('check_currency' in options) {
+      switch (options['check_currency']) {
+          case 'ln':
+          case 'eth':
+              currency = "currency="+options['check_currency'].toUpperCase()+"&"
+              data.currency = options['check_currency'].toUpperCase()
+              break;  
+          default:
+          case 'all':
+              currency = ""
+              break;
+      }
+    }
+
+    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
     
     return new Promise(function(resolve, reject) { $.ajax({
         url: req,
         type: "GET",
         crossDomain: true,
         dataType: "json",
-        beforeSend: function() {            
-        },
         success: function(res) {
             if(0 in res.responseData.content) {
               data = res.responseData.content[0];
@@ -170,6 +215,7 @@ async function gen_floor_price_text(data, selling, type, token_price) {
     if(data) { total_value += data.total * price_usd; }
     if(selling) { total_value += selling.total * price_usd; }
     
+    if('check_currency' in options) $(".dk-dosi-profile-container .dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase());
     $(".dk-dosi-profile-container .total_value").html(get_format_text(total_value, 'USD'));
 }
 
@@ -177,6 +223,7 @@ function prepare_container() {
   total_value = 0;
   $(profile_container).append("<div class='dk-dosi-profile-container'>"+
             "Your NFTs : <strong><span class='total_nft'>..</span> (~<span class='total_value'>..</span>)</strong>"+
+            "<div class='dk_filter'></div>"+
             "<table id='dk-dosi-profile-table' border='1'>"+
             "<thead>"+
                 "<tr>"+
@@ -272,6 +319,7 @@ async function generate_dosi_report(url = '') {
 
   let profile_id = dk_extract_profile_id(url);
   if(profile_id) {
+      options = await get_options();
       let data = await get_dosi_nfts(profile_id);
       let selling = await get_dosi_nfts(profile_id, "selling");
 
