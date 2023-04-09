@@ -12,43 +12,37 @@
   // const action = cxt.chrome.action;
   let dosi_type = {};
   // const local = storage.local; // use local.set() and local.get()
-  /*
-
-  // Configure commands in manifest.commands
-  setInterval(function() {
-    chrome.notifications.create('DK_DOSI_PRICE_ALERT', {
-        type: 'basic',
-        iconUrl: 'icon.png',
-        title: 'TEST',
-        message: 'ทดสอบ dosi',
-        priority: 2,
-        buttons: [
-          {
-              title: 'View'
-          },
-          {
-              title: 'Close'
-          }
-      ]
-    })
-  }, 10*1000);*/
-
   
   const storage = cxt.chrome.storage;
   const sync = storage.sync;
   let options = {};
 
-  function alert_price(title, message, id, url) {
-    chrome.notifications.create(id, {
+  function check_notification_click(notificationId, buttonIndex = 0) {
+    //console.log("NOTI CLICK",notificationId,buttonIndex);
+    let type = notificationId.split(" ")[0];
+    if(buttonIndex == 0 && type in dosi_type) {
+      tabs.create({ url: dosi_type[type]['url'] });
+    }
+  }
+
+  chrome.notifications.onClicked.addListener(check_notification_click);
+  chrome.notifications.onButtonClicked.addListener(check_notification_click);
+
+  function alert_price(floor, message) {
+    chrome.notifications.create(floor['type']+ ' ' + floor['price'], {
       type: 'basic',
-      iconUrl: 'icon.png',
-      title: title,
+      iconUrl: 'img/'+floor['type']+'.png',
+      title:  dosi_type[floor['type']]['name'] + " price alert",
       message: message,
-      priority: 2
+      requireInteraction: true,
+      buttons: [
+        { title: "View" },
+        { title: "Close" }
+      ]
     });
   }
 
-  function check_alert_price(name, floor, opt) {
+  function check_alert_price(floor, opt) {
     if(opt['alert_currency'] == 'usd') check_price = floor['price_usd'];
     else {
       if(floor['currency'] != opt['alert_currency']) {
@@ -58,9 +52,9 @@
     }    
 
     if(opt['alert_type'] == -1 && check_price < opt['alert_amount']) {
-      alert_price(name + " price alert", "Floor price < "+opt['alert_amount']+ " " + opt['alert_currency'], name+'_'+opt['alert_amount']+'_'+ opt['alert_currency'],"#");
+      alert_price(floor, "Floor price < "+opt['alert_amount']+ " " + opt['alert_currency']);
     } else if(opt['alert_type'] == 1 && check_price > opt['alert_amount']) {
-      alert_price(name + " price alert", "Floor price > "+opt['alert_amount']+ " " + opt['alert_currency'], name+'_'+opt['alert_amount']+'_'+ opt['alert_currency'], "#");
+      alert_price(floor, "Floor price > "+opt['alert_amount']+ " " + opt['alert_currency']);
     }
   }
 
@@ -70,9 +64,8 @@
     
     Object.keys(dosi_type).forEach(key => {    
       if(key in options['floor_alert']) {
-        if(key in floor) {          
-          let name = key.replace("_", " ").toUpperCase();
-          check_alert_price(name, floor[key], options['floor_alert'][key]);
+        if(key in floor) {
+          check_alert_price(floor[key], options['floor_alert'][key]);
         }
       }
     });
@@ -115,18 +108,12 @@
   async function start() {
     dosi_type = await get_dosi_type();
     
+    check_floor_price();
     setInterval(function() {
       check_floor_price();
-    }, 60*1000); // second * 1000
+    }, 20*1000); // second * 1000
   }
-
+  
   start()
-
-  /*commands &&
-    commands.onCommand.addListener(function (command) {
-    });
-
-  runtime.onMessage.addListener((message, sender, sendResponse) => {
-    sendResponse();
-  });*/
+  
 })(this);
