@@ -15,7 +15,6 @@
   async function get_options() {
     return new Promise(function(resolve, reject) {
         sync.get('dk_dosi_options', function(opt) {
-          console.log(opt['dk_dosi_options'])
           if('dk_dosi_options' in opt) {
             resolve(opt['dk_dosi_options']);
           } else {
@@ -25,131 +24,94 @@
     });
   }
 
-  async function get_token_price() {  
-    let req = "https://api.coingecko.com/api/v3/simple/price?ids=link%2Cethereum&vs_currencies=usd";
+async function get_floor_price() {
+  let check_currency = "";
+  if('check_currency' in options) check_currency = options['check_currency'];
+  let req = "https://dosi.newfolderhosting.com/api/floor/"+check_currency;
   
-    let data = {};
-    
-    return new Promise(function(resolve, reject) { $.ajax({
-          url: req,
-          type: "GET",
-          crossDomain: true,
-          dataType: "json",
-          success: function(res) {
-              //console.log(res)
-              data = res;
-              resolve(data)
-          }
-      });
+  return new Promise(function(resolve, reject) { $.ajax({
+        url: req,
+        type: "GET",
+        crossDomain: true,
+        dataType: "json",
+        success: function(res) {
+            data = res;
+            resolve(data)
+        }
     });
-  }
-  
-  function convert_price_usd(floor, conversion) {
-    let price_usd = 0;
-    switch (floor.currency) {
-      case 'LN':
-      case 'ln':
-        price_usd = floor.price*conversion.link.usd;
-        break;
-        
-      case 'ETH':
-      case 'eth':
-      default:
-        price_usd = floor.price*conversion.ethereum.usd;
-        break;   
-    }
-    return price_usd;
-  }
-
-function replace_text_element(elem, text = '') {    
-    //console.log("set text", text);
-    $(elem).html(text);
+  });
 }
 
-async function get_floor_price(filter, order = 'PRICE_ASC') {  
-    let data = {
-        "currency": "LN",
-        "id": "",
-        "price": 0,
-        "totalItems": 0
-    };
-    let str = '',url ='',currency='';
-    switch (filter) {
-        case 'dosi_lv1':
-            str = "propertyIds=947&"
-            break;
-        case 'dosi_lv2':
-            str = "propertyIds=1523913&"
-            break;
-        case 'dosi_lv3':
-            str = "propertyIds=1527441&"
-            break;
-        case 'dosi_lv4':
-            str = "propertyIds=1998823&"
-            break;
-        case 'cat':
-            str = "collectibleId=2&"
-            break;
-
-        default:
-            str = filter
-            break;
-    }
-    
-    if('check_currency' in options) {
-      switch (options['check_currency']) {
-          case 'ln':
-          case 'eth':
-              currency = "currency="+options['check_currency'].toUpperCase()+"&"
-              data.currency = options['check_currency'].toUpperCase()
-              break;  
-          default:
-          case 'all':
-              currency = ""
-              break;
-      }
-    }
-
-    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
-    
-    return new Promise(function(resolve, reject) { $.ajax({
-          url: req,
-          type: "GET",
-          crossDomain: true,
-          dataType: "json",
-          success: function(res) {
-              if(0 in res.responseData.content) {
-                data = res.responseData.content[0];
-                data.totalItems = res.responseData.totalElements;
-              }
-              data.url = 'https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&'+str+'category=&nftOrder='+order;
-              resolve(data)
-          }
-      });
+async function get_dosi_type() {
+  let req = "https://dosi.newfolderhosting.com/api/type/";
+  
+  return new Promise(function(resolve, reject) { $.ajax({
+        url: req,
+        type: "GET",
+        crossDomain: true,
+        dataType: "json",
+        success: function(res) {
+            data = res;
+            resolve(data)
+        }
     });
+  });
 }
 
-async function gen_floor_price_text(type, token_price, name = "") {
-    let floor = await get_floor_price(type);
-    let price_usd = convert_price_usd(floor, token_price);
+function gen_percent_change_text(percent) {
+  let res = ""
+  let color = "gray";
+
+  if(percent < 0) { color = "red" }
+  else if(percent > 0) { color = "green" }
+
+  res += "<span style='color:"+color+";'>" + percent.toFixed(2)+'%</span>';
+  return res;
+}
+
+async function gen_floor_price_text(type, floor, name = "") {
     let elem = "#popup_dk_floor_"+type;
 
-    replace_text_element(elem+" .amount", floor.totalItems.toLocaleString());
-    replace_text_element(elem+" .floor", floor.price+" "+floor.currency);
-    replace_text_element(elem+" .usd", new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price_usd));
+    $(elem+" .amount").html(floor.total_items.toLocaleString());
+    $(elem+" .amount_24change").html(gen_percent_change_text(floor.yesterday_total_items_change));
+    $(elem+" .floor").html(floor.price.toFixed(2)+" "+floor.currency);
+    $(elem+" .usd").html(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(floor.price_usd));
+    $(elem+" .usd_24change").html(gen_percent_change_text(floor.yesterday_price_usd_change));
 }
 
 async function generate_dosi_report() {    
   options = await get_options();
-  let token_price = await get_token_price();
+  const types = await get_dosi_type();
+  $(".popup_dk_floor_price_table tbody").html("");
+  let str = "";
+  Object.keys(types).forEach(key => {
+    let name = key.replace("_", " ").toUpperCase();
+    str += "<tr id='popup_dk_floor_"+key+"'>"+
+                  "<td align='left'>"+
+                      "<a href='"+types[key]['url']+"' target='_blank'>"+
+                          name+
+                      "</a>"+
+                  "</td>"+
+                  "<td align='right' class='amount'><img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' /></td>"+
+                  "<td align='right' class='amount_24change'><img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' /></td>"+
+                  "<td align='right' class='floor'><img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' /></td>"+
+                  "<td align='right' class='usd'><img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' /></td>"+
+                  "<td align='right' class='usd_24change'><img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' /></td>"+
+                "</tr>";
+  });
+  $(".popup_dk_floor_price_table tbody").append(str);
 
-  if('check_currency' in options) $(".popup_dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase());
-    
-  gen_floor_price_text("dosi_lv1", token_price, "DOSI LV1");
-  gen_floor_price_text("dosi_lv2", token_price, "DOSI LV2");
-  gen_floor_price_text("dosi_lv3", token_price, "DOSI LV3");
-  gen_floor_price_text("dosi_lv4", token_price, "DOSI LV4");
-  gen_floor_price_text("cat", token_price, "CAT");
+  const floor = await get_floor_price();
+
+  if('check_currency' in options) $(".popup_dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase()+" | ");
+  let updated_at = "";
+  Object.keys(floor).forEach(key => {
+    let name = key.replace("_", " ").toUpperCase();
+    gen_floor_price_text(key, floor[key], name);
+    updated_at = floor[key]['updated_at'];
+  });
+  
+  $(".popup_dk_updated").html("Updated : "+moment(updated_at).fromNow());
 }
 
   $(() => {

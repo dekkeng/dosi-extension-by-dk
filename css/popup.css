@@ -5,13 +5,17 @@ body {
 
 .popup_dk_floor_price_table {
     border-color: gray;
+    font-size: 16px;
 }
 .popup_dk_floor_price_table th{
+    min-width: 90px;
     text-align: center;
+    font-size: 12px;
 }
 
 .popup_dk_floor_price_table td{
-    min-width: 150px;
+    min-width: 90px;
+    font-size: 14px;
 }
 
 .option_button {
@@ -19,4 +23,15 @@ body {
     top: 5px;
     right: 10px;
     cursor: pointer;
+}
+
+.popup_dk_head_container {
+    display: flex;
+    flex-direction: row;
+}
+.popup_dk_head_container .popup_dk_filter {
+    order: 1;
+}
+.popup_dk_head_container .popup_dk_updated {
+    order: 2;
 }

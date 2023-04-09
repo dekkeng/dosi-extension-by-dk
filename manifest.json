@@ -1,6 +1,6 @@
 {
     "name": "DOSI extension by DK",
-    "version": "0.0.2.6",
+    "version": "0.0.2.8",
     "description": "Extension for DOSI platform that help you analyze and summarize DOSI platform",
     "manifest_version": 3,
     "options_page": "html/options.html",
@@ -34,6 +34,7 @@
             ],
             "js": [
                 "js/jquery.js",
+                "js/moment.js",
                 "js/contentScript.js"
             ],
             "all_frames": true,
@@ -45,5 +46,6 @@
         "tabs",
         "notifications"
     ],
+    "host_permissions": ["https://dosi.newfolderhosting.com/"],
     "author": "dekkeng"
 }
