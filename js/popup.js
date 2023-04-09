@@ -74,7 +74,7 @@ async function gen_floor_price_text(type, floor, name = "") {
 
     $(elem+" .amount").html(floor.total_items.toLocaleString());
     $(elem+" .amount_24change").html(gen_percent_change_text(floor.yesterday_total_items_change));
-    $(elem+" .floor").html(floor.price.toFixed(2)+" "+floor.currency);
+    $(elem+" .floor").html(floor.price.toFixed(4)+" "+floor.currency);
     $(elem+" .usd").html(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(floor.price_usd));
     $(elem+" .usd_24change").html(gen_percent_change_text(floor.yesterday_price_usd_change));
 }
