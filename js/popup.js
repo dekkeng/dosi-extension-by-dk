@@ -13,7 +13,6 @@
   let options = {};
   let popupTable;
   let dosi_types = {};
-  const loading_img = "<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' />";
   
   async function get_options() {
     return new Promise(function(resolve, reject) {
@@ -69,16 +68,6 @@ function gen_percent_change_text(percent) {
 
   res += "<span style='color:"+color+";'>" + sign +percent.toFixed(2)+'%</span>';
   return res;
-}
-
-async function gen_floor_price_text(type, floor) {
-    let elem = "#popup_dk_floor_"+type;
-
-    $(elem+" .amount").html(floor.total_items.toLocaleString());
-    $(elem+" .amount_24change").html(gen_percent_change_text(floor.yesterday_total_items_change));
-    $(elem+" .floor").html(floor.price.toFixed(4)+" "+floor.currency);
-    $(elem+" .usd").html(new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(floor.price_usd));
-    $(elem+" .usd_24change").html(gen_percent_change_text(floor.yesterday_price_usd_change));
 }
 
 async function generate_dosi_report() {    
@@ -140,41 +129,4 @@ async function generate_dosi_report() {
     generate_dosi_report()
     setInterval(generate_dosi_report, 20000)
   });
-/*
-  $("#shortcuts_link").click(() => {
-    tabs.create({ url: "chrome://extensions/shortcuts" });
-  });
-
-  $("#author_flaticon_url").click(() => {
-    tabs.create({ url: "https://www.flaticon.com/authors/flat-icons" });
-  });
-
-  $("#flaticon_url").click(() => {
-    tabs.create({ url: "https://www.flaticon.com/" });
-  });
-
-  $("#sampleInput").change(() => {
-    saveSettings();
-  });
-
-  $("#start").click(() => {
-    runtime.sendMessage({ m: "scrap" }, () => {
-      window.close();
-    });
-  });
-
-  function saveSettings() {
-    const settings = {};
-
-    settings.sampleInput = $("#sampleInput").val();
-
-    local.set({ settings: settings });
-  }
-
-  local.get("settings", (data) => {
-    const settings = data.settings;
-    if (settings) {
-      $("#sampleInput").val(settings.sampleInput);
-    }
-  });*/
 })(this);
