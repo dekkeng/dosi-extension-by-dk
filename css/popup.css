@@ -4,18 +4,16 @@ body {
 }
 
 .popup_dk_floor_price_table {
-    border-color: gray;
     font-size: 16px;
 }
 .popup_dk_floor_price_table th{
-    min-width: 90px;
-    text-align: center;
     font-size: 12px;
 }
 
 .popup_dk_floor_price_table td{
-    min-width: 90px;
     font-size: 14px;
+    width: 1px;
+    white-space: nowrap;
 }
 
 .option_button {
