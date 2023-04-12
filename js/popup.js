@@ -84,43 +84,28 @@ async function gen_floor_price_text(type, floor) {
 async function generate_dosi_report() {    
   options = await get_options();
   dosi_types = await get_dosi_type();
-  $(".popup_dk_floor_price_table tbody").html("");
-  let str = "";
-  Object.keys(dosi_types).forEach(key => {
-    str += "<tr id='popup_dk_floor_"+key+"'>"+
-                  "<td align='left'>"+
-                    "<img src='../img/"+dosi_types[key]['icon_image']+"' width='30' height='30' />"+
-                  "</td>"+
-                  "<td align='left'>"+
-                      "<a href='"+dosi_types[key]['url']+"' target='_blank'>"+
-                        dosi_types[key]['name']+
-                      "</a>"+
-                  "</td>"+
-                  "<td align='right' class='amount'>"+loading_img+"</td>"+
-                  "<td align='right' class='amount_24change'>"+loading_img+"</td>"+
-                  "<td align='right' class='floor'>"+loading_img+"</td>"+
-                  "<td align='right' class='usd'>"+loading_img+"</td>"+
-                  "<td align='right' class='usd_24change'>"+loading_img+"</td>"+
-                "</tr>";
-  });
-  $(".popup_dk_floor_price_table tbody").append(str);
-
   const floor = await get_floor_price();
 
   if('check_currency' in options) $(".popup_dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase()+" | ");
   let updated_at = "";
+
+  popupTable.clear().draw();
+
   Object.keys(floor).forEach(key => {
-    gen_floor_price_text(key, floor[key]);
+    popupTable.row.add([
+      "<img src='../img/"+dosi_types[key]['icon_image']+"' width='20' height='20' />",
+      "<a href='"+dosi_types[key]['url']+"' target='_blank'>"+dosi_types[key]['name']+"</a>",
+      floor[key].total_items.toLocaleString(),
+      gen_percent_change_text(floor[key].yesterday_total_items_change),
+      floor[key].price.toFixed(4)+" "+floor[key].currency,
+      new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(floor[key].price_usd),
+      gen_percent_change_text(floor[key].yesterday_price_usd_change)
+    ])
     updated_at = floor[key]['updated_at'];
   });
-  
+  popupTable.draw();
+
   $(".popup_dk_updated").html("Updated : "+moment(updated_at).fromNow());
-  popupTable = new DataTable('.popup_dk_floor_price_table', {
-      paging: false,
-      searching: false,
-      ordering:  false,
-      info: false
-  });
 }
 
   $(() => {
@@ -132,8 +117,28 @@ async function generate_dosi_report() {
       }
     });
 
+    popupTable = new DataTable('.popup_dk_floor_price_table', {
+      paging: false,
+      searching: false,
+      ordering:  false,
+      info: false,
+      columnDefs: [
+        {
+          "targets": [0],
+          "className": "text-center",
+        },
+        {
+          "targets": [1],
+          "className": "text-left",
+        },
+        {
+          "targets": [2,3,4,5,6],
+          "className": "text-right",
+        }
+      ]
+    });
     generate_dosi_report()
-    //setInterval(generate_dosi_report, 20000)
+    setInterval(generate_dosi_report, 20000)
   });
 /*
   $("#shortcuts_link").click(() => {
