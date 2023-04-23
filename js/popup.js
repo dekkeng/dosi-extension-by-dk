@@ -75,15 +75,22 @@ async function generate_dosi_report() {
   dosi_types = await get_dosi_type();
   const floor = await get_floor_price();
 
-  if('check_currency' in options) $(".popup_dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase()+" | ");
+  let currency_filter = "";
+
+  if('check_currency' in options) {
+    currency_filter = options['check_currency'].toUpperCase();
+    $(".popup_dk_filter").html("Filtered currency : "+currency_filter+" | ");
+    if(currency_filter == "ALL") currency_filter = "";
+  }
   let updated_at = "";
+
 
   popupTable.clear().draw();
 
   Object.keys(floor).forEach(key => {
     popupTable.row.add([
       "<img src='../img/"+dosi_types[key]['icon_image']+"' width='20' height='20' />",
-      "<a href='"+dosi_types[key]['url']+"' target='_blank'>"+dosi_types[key]['name']+"</a>",
+      "<a href='"+dosi_types[key]['url']+"&currency="+currency_filter+"' target='_blank'>"+dosi_types[key]['name']+"</a>",
       floor[key].total_items.toLocaleString(),
       gen_percent_change_text(floor[key].yesterday_total_items_change),
       floor[key].price.toFixed(4)+" "+floor[key].currency,
@@ -94,7 +101,7 @@ async function generate_dosi_report() {
   });
   popupTable.draw();
 
-  $(".popup_dk_updated").html("Updated : "+moment(updated_at).fromNow());
+  $(".popup_dk_updated").html(" "+moment(updated_at).format("D MMM YYYY HH:mm:ss [GMT]Z") + " ("+moment(updated_at).fromNow()+")");
 }
 
   $(() => {

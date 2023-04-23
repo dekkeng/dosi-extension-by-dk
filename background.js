@@ -62,13 +62,15 @@
     options = await get_options();
     let floor = await get_floor_price();
     
-    Object.keys(dosi_type).forEach(key => {    
-      if(key in options['floor_alert']) {
-        if(key in floor) {
-          check_alert_price(floor[key], options['floor_alert'][key]);
+    if('floor_alert' in options) {
+      Object.keys(dosi_type).forEach(key => {    
+        if(key in options['floor_alert']) {
+          if(key in floor) {
+            check_alert_price(floor[key], options['floor_alert'][key]);
+          }
         }
-      }
-    });
+      });
+    }
   }
   
   async function get_options() {

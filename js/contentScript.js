@@ -221,6 +221,7 @@ async function gen_floor_price_text(data, selling, type, token_price) {
 
 function prepare_container() {
   total_value = 0;
+  $(".dk-dosi-profile-container").remove();
   $(profile_container).append("<div class='dk-dosi-profile-container'>"+
             "Your NFTs : <strong><span class='total_nft'>..</span> (~<span class='total_value'>..</span>)</strong>"+
             "<div class='dk_filter'></div>"+
