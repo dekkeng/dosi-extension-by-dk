@@ -35,25 +35,6 @@
     });
   }
 
-  async function get_token_price() {  
-    let req = "https://api.coingecko.com/api/v3/simple/price?ids=link%2Cethereum&vs_currencies=usd";
-  
-    let data = {};
-    
-    return new Promise(function(resolve, reject) { $.ajax({
-          url: req,
-          type: "GET",
-          crossDomain: true,
-          dataType: "json",
-          success: function(res) {
-              //console.log(res)
-              data = res;
-              resolve(data)
-          }
-      });
-    });
-  }
-
   async function get_dosi_nfts(id, type = 'collections') {
     let condition = {
       "id": id,
@@ -116,13 +97,13 @@
     switch (floor.currency) {
       case 'LN':
       case 'ln':
-        price_usd = floor.price*conversion.link.usd;
+        price_usd = floor.primaryPrice*conversion.link.usd;
         break;
         
       case 'ETH':
       case 'eth':
       default:
-        price_usd = floor.price*conversion.ethereum.usd;
+        price_usd = floor.primaryPrice*conversion.ethereum.usd;
         break;   
     }
     return price_usd;
@@ -154,8 +135,11 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
         case 'dosi_lv4':
             str = "propertyIds=1998823&"
             break;
+        case 'dog':
+            str = "collectibleId=2&propertyIds=12329694&"
+            break;
         case 'cat':
-            str = "collectibleId=2&"
+            str = "collectibleId=2&propertyIds=5856722&"
             break;
 
         default:
@@ -205,12 +189,12 @@ async function gen_floor_price_text(data, selling, type, token_price) {
     let floor = await get_floor_price(type);
     let price_usd = convert_price_usd(floor, token_price);
     let elem = "#dk_floor_"+type;
-
+    
     replace_text_element(elem+" .owned", (data?data.total : "0"));
     replace_text_element(elem+" .selling", (selling?selling.total : "0"));
     replace_text_element(elem+" .market", floor.totalItems.toLocaleString());
-    replace_text_element(elem+" .floor", floor.price+" "+floor.currency);
-    replace_text_element(elem+" .usd", get_format_text(price_usd, 'USD'));
+    replace_text_element(elem+" .floor", floor.primaryPrice.toFixed(4)+" "+floor.primaryCurrency);
+    replace_text_element(elem+" .usd", floor.secondaryPrice.toFixed(4)+" "+floor.secondaryCurrency);
 
     if(data) { total_value += data.total * price_usd; }
     if(selling) { total_value += selling.total * price_usd; }
@@ -285,10 +269,22 @@ function prepare_container() {
                     "<td align='right' class='floor'>"+loading_image+"</td>"+
                     "<td align='right' class='usd'>"+loading_image+"</td>"+
                 "</tr>"+
+                "<tr id='dk_floor_dog'>"+
+                    "<td align='left'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=12329694&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Puppy"+
+                      "</a>"+
+                    "</td>"+
+                    "<td align='right' class='owned'>"+loading_image+"</td>"+
+                    "<td align='right' class='selling'>"+loading_image+"</td>"+
+                    "<td align='right' class='market'>"+loading_image+"</td>"+
+                    "<td align='right' class='floor'>"+loading_image+"</td>"+
+                    "<td align='right' class='usd'>"+loading_image+"</td>"+
+                "</tr>"+
                 "<tr id='dk_floor_cat'>"+
                     "<td align='left'>"+
-                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&amp;collectibleId=2&amp;category=&amp;nftOrder=PRICE_ASC' target='_blank'>"+
-                          "CAT"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=5856722&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Kitten"+
                       "</a>"+
                     "</td>"+
                     "<td align='right' class='owned'>"+loading_image+"</td>"+
@@ -332,6 +328,7 @@ async function generate_dosi_report(url = '') {
       gen_floor_price_text(data.summary['Visitor'], selling.summary['Visitor'], "dosi_lv2", token_price);
       gen_floor_price_text(data.summary['Resident'], selling.summary['Resident'], "dosi_lv3", token_price);
       gen_floor_price_text(data.summary['Citizen'], selling.summary['Citizen'], "dosi_lv4", token_price);
+      gen_floor_price_text(data.summary['Dog'], selling.summary['Dog'], "dog", token_price);
       gen_floor_price_text(data.summary['Cat'], selling.summary['Cat'], "cat", token_price);
   }
 }
