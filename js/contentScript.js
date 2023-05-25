@@ -6,7 +6,7 @@
   const window = cxt.window;
   const document = cxt.document;
   const $ = cxt.$;  
-  const profile_container = "#__next > main > div > div > div > div > div.chakra-stack > div";
+  const profile_container = "#__next > main > div > div > div > div > div.chakra-stack > div:first-of-type";
   const loading_image = "<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' />";
   const storage = cxt.chrome.storage;
   const runtime = cxt.chrome.runtime;
@@ -92,21 +92,8 @@
     });
   }
   
-  function convert_price_usd(floor, conversion) {
-    let price_usd = 0;
-    switch (floor.currency) {
-      case 'LN':
-      case 'ln':
-        price_usd = floor.primaryPrice*conversion.link.usd;
-        break;
-        
-      case 'ETH':
-      case 'eth':
-      default:
-        price_usd = floor.primaryPrice*conversion.ethereum.usd;
-        break;   
-    }
-    return price_usd;
+  function convert_price_usd(floor) {
+    return floor.secondaryPrice;
   }
 
 function replace_text_element(elem, text = '') {    
@@ -116,7 +103,7 @@ function replace_text_element(elem, text = '') {
 
 async function get_floor_price(filter, order = 'PRICE_ASC') {  
     let data = {
-        "currency": "LN",
+        "currency": "FNSA",
         "id": "",
         "price": 0,
         "totalItems": 0
@@ -152,6 +139,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
 
     if('check_currency' in options) {
       switch (options['check_currency']) {
+          case 'fnsa':
           case 'ln':
           case 'eth':
               currency = "currency="+options['check_currency'].toUpperCase()+"&"
@@ -188,9 +176,8 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
 function get_format_text(price, currency, style='currency') {
   return new Intl.NumberFormat('en-US', { style: style, currency: currency }).format(price)
 }
-async function gen_floor_price_text(data, selling, type, token_price) {
+async function gen_floor_price_text(data, selling, type) {
     let floor = await get_floor_price(type);
-    let price_usd = convert_price_usd(floor, token_price);
     let elem = "#dk_floor_"+type;
     
     replace_text_element(elem+" .owned", (data?data.total : "0"));
@@ -199,8 +186,8 @@ async function gen_floor_price_text(data, selling, type, token_price) {
     replace_text_element(elem+" .floor", floor.primaryPrice.toFixed(4)+" "+floor.primaryCurrency);
     replace_text_element(elem+" .usd", floor.secondaryPrice.toFixed(4)+" "+floor.secondaryCurrency);
 
-    if(data) { total_value += data.total * price_usd; }
-    if(selling) { total_value += selling.total * price_usd; }
+    if(data) { total_value += data.total * floor.secondaryPrice; }
+    if(selling) { total_value += selling.total * floor.secondaryPrice; }
     
     if('check_currency' in options) $(".dk-dosi-profile-container .dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase());
     $(".dk-dosi-profile-container .total_value").html(get_format_text(total_value, 'USD'));
@@ -209,6 +196,8 @@ async function gen_floor_price_text(data, selling, type, token_price) {
 function prepare_container() {
   total_value = 0;
   $(".dk-dosi-profile-container").remove();
+  $(profile_container).parent().removeClass("dk-container");
+  $(profile_container).parent().addClass("dk-container");
   $(profile_container).append("<div class='dk-dosi-profile-container'>"+
             "Your NFTs : <strong><span class='total_nft'>..</span> (~<span class='total_value'>..</span>)</strong>"+
             "<div class='dk_filter'></div>"+
@@ -337,15 +326,13 @@ async function generate_dosi_report(url = '') {
 
       $(".dk-dosi-profile-container .total_nft").html(data.list.length + selling.list.length);
 
-      let token_price = await get_token_price();
-
-      gen_floor_price_text(data.summary['Traveler'], selling.summary['Traveler'], "dosi_lv1", token_price);
-      gen_floor_price_text(data.summary['Visitor'], selling.summary['Visitor'], "dosi_lv2", token_price);
-      gen_floor_price_text(data.summary['Resident'], selling.summary['Resident'], "dosi_lv3", token_price);
-      gen_floor_price_text(data.summary['Citizen'], selling.summary['Citizen'], "dosi_lv4", token_price);
-      gen_floor_price_text(data.summary['Dog'], selling.summary['Dog'], "dog", token_price);
-      gen_floor_price_text(data.summary['Cat'], selling.summary['Cat'], "cat", token_price);
-      gen_floor_price_text(data.summary['Robo Cat'], selling.summary['Robo Cat'], "catabotica", token_price);
+      gen_floor_price_text(data.summary['Traveler'], selling.summary['Traveler'], "dosi_lv1");
+      gen_floor_price_text(data.summary['Visitor'], selling.summary['Visitor'], "dosi_lv2");
+      gen_floor_price_text(data.summary['Resident'], selling.summary['Resident'], "dosi_lv3");
+      gen_floor_price_text(data.summary['Citizen'], selling.summary['Citizen'], "dosi_lv4");
+      gen_floor_price_text(data.summary['Dog'], selling.summary['Dog'], "dog");
+      gen_floor_price_text(data.summary['Cat'], selling.summary['Cat'], "cat");
+      gen_floor_price_text(data.summary['Robo Cat'], selling.summary['Robo Cat'], "catabotica");
   }
 }
 
