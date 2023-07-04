@@ -91,11 +91,11 @@ async function generate_dosi_report() {
     popupTable.row.add([
       "<img src='../img/"+dosi_types[key]['icon_image']+"' width='20' height='20' />",
       "<a href='"+dosi_types[key]['url']+"&currency="+currency_filter+"' target='_blank'>"+dosi_types[key]['name']+"</a>",
-      floor[key].total_items.toLocaleString(),
-      gen_percent_change_text(floor[key].yesterday_total_items_change),
       floor[key].price.toFixed(4)+" "+floor[key].currency,
       new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(floor[key].price_usd),
-      gen_percent_change_text(floor[key].yesterday_price_usd_change)
+      gen_percent_change_text(floor[key].yesterday_price_usd_change),
+      floor[key].total_items.toLocaleString(),
+      gen_percent_change_text(floor[key].yesterday_total_items_change),
     ])
     updated_at = floor[key]['updated_at'];
   });
