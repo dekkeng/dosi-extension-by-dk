@@ -1,6 +1,6 @@
 {
     "name": "DOSI extension by DK",
-    "version": "0.0.3.12",
+    "version": "0.0.4.0",
     "description": "Extension for DOSI platform that help you analyze and summarize DOSI platform",
     "manifest_version": 3,
     "options_page": "html/options.html",
@@ -36,6 +36,22 @@
                 "js/jquery.js",
                 "js/moment.js",
                 "js/contentScript.js"
+            ],
+            "all_frames": true,
+            "run_at": "document_end"
+        },
+        {
+            "matches": [
+              "http://citizen.dosi.world/arcade/game/*",
+              "https://citizen.dosi.world/arcade/game/*"
+            ],
+            "css": [
+                "css/arcadeContent.css"
+            ],
+            "js": [
+                "js/jquery.js",
+                "js/moment.js",
+                "js/arcadeContent.js"
             ],
             "all_frames": true,
             "run_at": "document_end"
