@@ -128,6 +128,15 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
         case 'cat':
             str = "collectibleId=2&propertyIds=5856722&"
             break;
+        case 'pygmy':
+            str = "collectibleId=2&propertyIds=14535024&"
+            break;
+        case 'goose':
+            str = "collectibleId=2&propertyIds=13760822&"
+            break;
+        case 'tako':
+            str = "collectibleId=2&propertyIds=15900079&"
+            break;
         case 'catabotica':
             str = "collectibleId=2&propertyIds=12781316%2C5856722&"
             break;
@@ -288,6 +297,42 @@ function prepare_container() {
                     "<td align='right' class='floor'>"+loading_image+"</td>"+
                     "<td align='right' class='usd'>"+loading_image+"</td>"+
                 "</tr>"+
+                "<tr id='dk_floor_goose'>"+
+                    "<td align='left'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=13760822&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Goose"+
+                      "</a>"+
+                    "</td>"+
+                    "<td align='right' class='owned'>"+loading_image+"</td>"+
+                    "<td align='right' class='selling'>"+loading_image+"</td>"+
+                    "<td align='right' class='market'>"+loading_image+"</td>"+
+                    "<td align='right' class='floor'>"+loading_image+"</td>"+
+                    "<td align='right' class='usd'>"+loading_image+"</td>"+
+                "</tr>"+
+                "<tr id='dk_floor_pygmy'>"+
+                    "<td align='left'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=14535024&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Pygmy"+
+                      "</a>"+
+                    "</td>"+
+                    "<td align='right' class='owned'>"+loading_image+"</td>"+
+                    "<td align='right' class='selling'>"+loading_image+"</td>"+
+                    "<td align='right' class='market'>"+loading_image+"</td>"+
+                    "<td align='right' class='floor'>"+loading_image+"</td>"+
+                    "<td align='right' class='usd'>"+loading_image+"</td>"+
+                "</tr>"+
+                "<tr id='dk_floor_tako'>"+
+                    "<td align='left'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=15900079&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Tako"+
+                      "</a>"+
+                    "</td>"+
+                    "<td align='right' class='owned'>"+loading_image+"</td>"+
+                    "<td align='right' class='selling'>"+loading_image+"</td>"+
+                    "<td align='right' class='market'>"+loading_image+"</td>"+
+                    "<td align='right' class='floor'>"+loading_image+"</td>"+
+                    "<td align='right' class='usd'>"+loading_image+"</td>"+
+                "</tr>"+
                 "<tr id='dk_floor_catabotica'>"+
                     "<td align='left'>"+
                       "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=12781316%2C5856722&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
@@ -347,6 +392,9 @@ async function generate_dosi_report(url = '') {
       gen_floor_price_text(data.summary['Citizen'], selling.summary['Citizen'], "dosi_lv4");
       gen_floor_price_text(data.summary['Dog'], selling.summary['Dog'], "dog");
       gen_floor_price_text(data.summary['Cat'], selling.summary['Cat'], "cat");
+      gen_floor_price_text(data.summary['Chameleon'], selling.summary['Chameleon'], "pygmy");
+      gen_floor_price_text(data.summary['Goose'], selling.summary['Goose'], "goose");
+      gen_floor_price_text(data.summary['Octopus'], selling.summary['Octopus'], "tako");
       gen_floor_price_text(data.summary['Robo Cat'], selling.summary['Robo Cat'], "catabotica");
       gen_floor_price_text(data.summary['Robo Rex'], selling.summary['Robo Rex'], "roborex");
   }
