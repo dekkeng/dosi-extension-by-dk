@@ -10,8 +10,9 @@
   const loading_image = "<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' />";
   const storage = cxt.chrome.storage;
   const runtime = cxt.chrome.runtime;
-   
-   let total_value = 0;
+  
+  let new_container = true;
+  let total_value = 0;
   // const commands = cxt.chrome.commands;
   // const tabs = cxt.chrome.tabs;
   // const windows = cxt.chrome.windows;
@@ -47,7 +48,7 @@
     };
   
   while(condition.last == false) {
-    let req = "https://citizen.store.dosi.world/api/stores/v2/my-nft/"+condition.id+"/"+type+"?"+condition.pageToken;
+    let req = "https://api.store.dosi.world/stores/citizen/v2/my-nft/"+condition.id+"/"+type+"?"+condition.pageToken;
     await fetch(req)
         .then(res => res.json())
         .then(res => {
@@ -164,7 +165,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
       }
     }
 
-    let req = "https://citizen.store.dosi.world/api/stores/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
+    let req = "https://api.store.dosi.world/stores/citizen/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
     
     return new Promise(function(resolve, reject) { $.ajax({
         url: req,
@@ -206,6 +207,11 @@ async function gen_floor_price_text(data, selling, type) {
 }
 
 function prepare_container() {
+  console.log($(".dk-dosi-profile-container").length);
+  if($(".dk-dosi-profile-container").length !== 0) {
+    return false;
+  }
+  
   total_value = 0;
   $(".dk-dosi-profile-container").remove();
   $(profile_container).parent().removeClass("dk-container");
@@ -374,6 +380,10 @@ function dk_extract_profile_id(url) {
 }
 
 async function generate_dosi_report(url = '') {
+  if(!new_container) return false;
+  
+  new_container = false;
+  
   if(url == '') {
       url = window.location.href;
   }
@@ -401,8 +411,10 @@ async function generate_dosi_report(url = '') {
 }
 
   $(() => {
-    prepare_container();
-    generate_dosi_report();
+    setInterval(function() {
+      prepare_container();
+      generate_dosi_report();
+    }, 2000)
     // toastr["success"]("Content script inserted", "Ext");
     //
     // Swal.fire({

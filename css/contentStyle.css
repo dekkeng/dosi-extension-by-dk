@@ -1,5 +1,6 @@
 .dk-dosi-profile-container {
-    font-size: 2rem;
+    font-size: 15px;
+    padding: 20px 0;
 }
 
 .dk-container {
@@ -14,6 +15,9 @@
 #dk-dosi-profile-table {
     width: 800px;
     max-width: 100%;
+}
+#dk-dosi-profile-table tr:nth-child(even) {
+    background: rgb(224, 224, 224);
 }
 
 .option_button {
