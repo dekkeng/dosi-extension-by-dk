@@ -80,7 +80,6 @@
                       "<select class='form-control alert_currency'>"+
                           "<option value='usd' selected>USD</option>"+
                           "<option value='fnsa'>FNSA</option>"+
-                          "<option value='eth'>ETH</option>"+
                       "</select>"+
                   "</div>"+
                 "</div>";

@@ -150,7 +150,10 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
             break;
     }
 
-    if('check_currency' in options) {
+    currency = "currency=FNSA&";
+    data.currency = "FNSA";
+
+   /* if('check_currency' in options) {
       switch (options['check_currency']) {
           case 'fnsa':
           case 'ln':
@@ -163,7 +166,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
               currency = ""
               break;
       }
-    }
+    }*/
 
     let req = "https://api.store.dosi.world/stores/citizen/v1/dosi/market/nfts?pageNo=1&"+str+"category=&"+currency+"nftOrder="+order;
     
@@ -202,7 +205,7 @@ async function gen_floor_price_text(data, selling, type) {
     if(data) { total_value += data.total * floor.secondaryPrice; }
     if(selling) { total_value += selling.total * floor.secondaryPrice; }
     
-    if('check_currency' in options) $(".dk-dosi-profile-container .dk_filter").html("Filtered currency : "+options['check_currency'].toUpperCase());
+    if('check_currency' in options) $(".dk-dosi-profile-container .dk_filter").html("Filtered currency : FNSA");
     $(".dk-dosi-profile-container .total_value").html(get_format_text(total_value, 'USD'));
 }
 

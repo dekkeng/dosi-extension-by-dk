@@ -27,8 +27,8 @@
   }
 
 async function get_floor_price() {
-  let check_currency = "";
-  if('check_currency' in options) check_currency = options['check_currency'];
+  let check_currency = "fnsa";
+  //if('check_currency' in options) check_currency = options['check_currency'];
   let req = "https://dosi.newfolderhosting.com/api/floor/"+check_currency;
   
   return new Promise(function(resolve, reject) { $.ajax({
@@ -75,13 +75,14 @@ async function generate_dosi_report() {
   dosi_types = await get_dosi_type();
   const floor = await get_floor_price();
 
-  let currency_filter = "";
-
+  let currency_filter = "FNSA";
+  $(".popup_dk_filter").html("Filtered currency : FNSA | ");
+/*
   if('check_currency' in options) {
     currency_filter = options['check_currency'].toUpperCase();
     $(".popup_dk_filter").html("Filtered currency : "+currency_filter+" | ");
     if(currency_filter == "ALL") currency_filter = "";
-  }
+  }*/
   let updated_at = "";
 
 
