@@ -139,7 +139,7 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
             str = "collectibleId=2&propertyIds=15900079&"
             break;
         case 'catabotica':
-            str = "collectibleId=2&propertyIds=12781316%2C5856722&"
+            str = "collectibleId=2&propertyIds=16094636&"
             break;
         case 'roborex':
             str = "propertyIds=15342276&"
@@ -344,7 +344,7 @@ function prepare_container() {
                 "</tr>"+
                 "<tr id='dk_floor_catabotica'>"+
                     "<td align='left'>"+
-                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=12781316%2C5856722&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=16094636&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
                           "Catabotica"+
                       "</a>"+
                     "</td>"+
