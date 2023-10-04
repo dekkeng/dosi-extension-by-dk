@@ -11,7 +11,6 @@
     const storage = cxt.chrome.storage;
     const runtime = cxt.chrome.runtime;
      
-     let total_value = 0;
     // const commands = cxt.chrome.commands;
     // const tabs = cxt.chrome.tabs;
     // const windows = cxt.chrome.windows;
@@ -21,6 +20,7 @@
     const sync = storage.sync;
   
     let options = {};
+    let score_sent = false;
   
     async function get_options() {
       return new Promise(function(resolve, reject) {
@@ -33,6 +33,56 @@
           });
       });
     }
+
+    function send_dosi_game_ranking(game, data) {
+      /*let req = "https://api.store.dosi.world/stores/citizen/v2/login/status?loginFinishUri=https%3A%2F%2Fcitizen.store.dosi.world%2Fen-US%2Fprofile";
+      fetch(req)
+          .then(res => res.json())
+          .then(res => {
+            let userData = res;
+            let req2 = "https://dosi.newfolderhosting.com/api/update_game_score";
+            fetch(req2,{
+                  method: "POST",
+                  body: JSON.stringify({
+                    'uid': userData.uid,
+                    'user_data': JSON.stringify(userData),
+                    'game': game,
+                    'rank': data.myRank,
+                    'score': data.myScore,
+                    'play_time': data.myPlayTms,
+                    'week_start': data.weekBeginTms,
+                    'week_end': data.weekEndTms,
+                    'raw_data': JSON.stringify(data)
+                  }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+            });
+          })*/
+
+        
+        let req = "https://dosi.newfolderhosting.com/api/update_game_score";
+        fetch(req,{
+              method: "POST",
+              body: JSON.stringify({
+                //'uid': userData.uid,
+                //'user_data': JSON.stringify(userData),
+                'game': game,
+                'rank': data.myRank,
+                'score': data.myScore,
+                'play_time': data.myPlayTms,
+                'week_start': data.weekBeginTms,
+                'week_end': data.weekEndTms,
+                'raw_data': JSON.stringify(data)
+              }),
+              headers: {
+                'Content-Type': 'application/json',
+              },
+        });
+      
+
+        return true;
+    }
   
     async function get_dosi_game_ranking(game) {
         let data = {};
@@ -41,6 +91,10 @@
             .then(res => res.json())
             .then(res => {
                 data = res;
+                if(!score_sent && data.myRank > 0) {
+                  send_dosi_game_ranking(game, data);
+                  score_sent = true;
+                }
             })
         return data;
     }
