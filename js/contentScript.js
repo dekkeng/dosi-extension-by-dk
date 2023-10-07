@@ -26,7 +26,6 @@
   async function get_options() {
     return new Promise(function(resolve, reject) {
         sync.get('dk_dosi_options', function(opt) {
-          console.log(opt['dk_dosi_options'])
           if('dk_dosi_options' in opt) {
             resolve(opt['dk_dosi_options']);
           } else {
@@ -210,8 +209,7 @@ async function gen_floor_price_text(data, selling, type) {
 }
 
 function prepare_container() {
-  console.log($(".dk-dosi-profile-container").length);
-  if($(".dk-dosi-profile-container").length !== 0) {
+  if($(".dk-dosi-profile-container").length != 0) {
     return false;
   }
   
@@ -391,7 +389,8 @@ async function generate_dosi_report(url = '') {
       url = window.location.href;
   }
 
-  let profile_id = dk_extract_profile_id(url);
+  let profile_id = dk_extract_profile_id(url)*1;
+  
   if(profile_id) {
       options = await get_options();
       let data = await get_dosi_nfts(profile_id);

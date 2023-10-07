@@ -20,7 +20,6 @@
     const sync = storage.sync;
   
     let options = {};
-    let score_sent = false;
   
     async function get_options() {
       return new Promise(function(resolve, reject) {
@@ -33,73 +32,12 @@
           });
       });
     }
-
-    function send_dosi_game_ranking(game, data) {
-      /*let req = "https://api.store.dosi.world/stores/citizen/v2/login/status?loginFinishUri=https%3A%2F%2Fcitizen.store.dosi.world%2Fen-US%2Fprofile";
-      fetch(req)
-          .then(res => res.json())
-          .then(res => {
-            let userData = res;
-            let req2 = "https://dosi.newfolderhosting.com/api/update_game_score";
-            fetch(req2,{
-                  method: "POST",
-                  body: JSON.stringify({
-                    'uid': userData.uid,
-                    'user_data': JSON.stringify(userData),
-                    'game': game,
-                    'rank': data.myRank,
-                    'score': data.myScore,
-                    'play_time': data.myPlayTms,
-                    'week_start': data.weekBeginTms,
-                    'week_end': data.weekEndTms,
-                    'raw_data': JSON.stringify(data)
-                  }),
-                  headers: {
-                    'Content-Type': 'application/json',
-                  },
-            });
-          })*/
-
-        
-        let req = "https://dosi.newfolderhosting.com/api/update_game_score";
-        fetch(req,{
-              method: "POST",
-              body: JSON.stringify({
-                //'uid': userData.uid,
-                //'user_data': JSON.stringify(userData),
-                'game': game,
-                'rank': data.myRank,
-                'score': data.myScore,
-                'play_time': data.myPlayTms,
-                'week_start': data.weekBeginTms,
-                'week_end': data.weekEndTms,
-                'raw_data': JSON.stringify(data)
-              }),
-              headers: {
-                'Content-Type': 'application/json',
-              },
-        });
-      
-
-        return true;
-    }
-  
-    async function get_dosi_game_ranking(game) {
-        let data = {};
-        let req = "https://citizen.dosi.world/api/citizen/v1/arcade/"+game+"/ranking";
-        await fetch(req)
-            .then(res => res.json())
-            .then(res => {
-                data = res;
-                if(!score_sent && data.myRank > 0) {
-                  send_dosi_game_ranking(game, data);
-                  score_sent = true;
-                }
-            })
-        return data;
-    }
     
   function dk_extract_arcade_game(url) {
+    if(!url.includes("game")) {
+      return 0;
+    }
+
     let tmp = url.split('/');
     let f_i = 5;
     for (let i = 0; i < tmp.length; i++) {
@@ -134,10 +72,67 @@
     }
   }
   
+  function send_dosi_game_ranking(game, data) {        
+      let req = "https://dosi.newfolderhosting.com/api/update_game_score";
+      fetch(req,{
+          method: "POST",
+          body: JSON.stringify({
+              //'uid': userData.uid,
+              //'user_data': JSON.stringify(userData),
+              'game': game,
+              'rank': data.myRank,
+              'score': data.myScore,
+              'play_time': data.myPlayTms,
+              'week_start': data.weekBeginTms,
+              'week_end': data.weekEndTms,
+              'raw_data': JSON.stringify(data)
+          }),
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      });
+
+
+      return true;
+  }
+
+  async function get_dosi_game_ranking(game) {
+      let data = {};
+      let req = "https://citizen.dosi.world/api/citizen/v1/arcade/"+game+"/ranking";
+      await fetch(req)
+          .then(res => res.json())
+          .then(res => {
+              data = res;
+              if(data.myRank > 0) {
+                send_dosi_game_ranking(game, data);
+              }
+          })
+      return data;
+  }
+
+  function get_all_game_score() {
+      let data = {};
+      let req = "https://citizen.dosi.world/api/citizen/v1/arcade";
+      fetch(req)
+          .then(res => res.json())
+          .then(res => {
+              data = res.arcadeList;
+              data.forEach(g => {
+                  get_dosi_game_ranking(g.gameId);
+              });
+          })
+      return data;
+  }
+
     $(() => {
         setInterval(function() {
             generate_dosi_ranking_report();
         }, 2000)
+        
+        setInterval(function() {
+            get_all_game_score();
+        }, 30000)
+        get_all_game_score();
     });
   
     runtime.onMessage.addListener((message, sender, sendResponse) => {
