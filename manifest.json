@@ -1,6 +1,6 @@
 {
     "name": "DOSI extension by DK",
-    "version": "0.0.4.4",
+    "version": "0.0.4.5",
     "description": "Extension for DOSI platform that help you analyze and summarize DOSI platform",
     "manifest_version": 3,
     "options_page": "html/options.html",
@@ -26,8 +26,8 @@
     "content_scripts": [
         {
             "matches": [
-              "http://*.dosi.world/*",
-              "https://*.dosi.world/*"
+              "http://citizen.dosi.world/*",
+              "https://citizen.dosi.world/*"
             ],
             "css": [
                 "css/contentStyle.css",
