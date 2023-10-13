@@ -64,7 +64,11 @@ function gen_percent_change_text(percent) {
   let res = "", color = "gray", sign = "";
 
   if(percent < 0) { color = "red" }
-  else if(percent > 0) { color = "green"; sign = "+"; }
+  else if(percent > 0) { 
+    color = "green"; 
+    sign = "+";
+    if(percent > 100) percent = 100;
+  }
 
   res += "<span style='color:"+color+";'>" + sign +percent.toFixed(2)+'%</span>';
   return res;
