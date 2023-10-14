@@ -389,10 +389,10 @@ function dk_extract_profile_id(url) {
   for (let i = 0; i < tmp.length; i++) {
     if(tmp[i] == 'profile' && (i+1) in tmp) {
       f_i = i+1;
-      break;
+      return tmp[f_i].split('?')[0];
     }
   }
-  return tmp[f_i].split('?')[0];
+  return false;
 }
 
 async function generate_dosi_report(url = '') {

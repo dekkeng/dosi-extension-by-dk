@@ -67,11 +67,22 @@
     }
   }
   
-  function send_dosi_game_ranking(data) {        
+  function send_dosi_game_ranking(game, data) {        
       let req = "https://dosi.newfolderhosting.com/api/update_game_score";
       fetch(req,{
-          method: "POST",
-          body: JSON.stringify(data),
+          method: "POST",          
+          body: JSON.stringify({
+            //'uid': userData.uid,
+            //'user_data': JSON.stringify(userData),
+            'game': game,
+            'rank': data.myRank,
+            'score': data.myScore,
+            'play_time': data.myPlayTms,
+            'week_start': data.weekBeginTms,
+            'week_end': data.weekEndTms,
+            'raw_data': JSON.stringify(data)
+          }),
+          //body: JSON.stringify(data),
           headers: {
               'Content-Type': 'application/json',
           },
@@ -89,6 +100,7 @@
           .then(res => {
               if(res.myRank > 0) {
                 data = res;
+                send_dosi_game_ranking(game, data);
               }
           })
       return data;
@@ -108,13 +120,14 @@
               data.forEach(async g => {
                 let g_data = g;
                 let d = await get_dosi_game_ranking(g_data.gameId);
+                /*
                 console.log(d)
                 score_list.data.push({
                   'game': g_data.gameId,
                   'score': 111,
-                });
+                });*/
               });
-              send_dosi_game_ranking(score_list);
+              //send_dosi_game_ranking(score_list);
           })
       return data;
   }
@@ -144,7 +157,7 @@
   }
 
     $(() => {
-      getOrCreateClientId();
+      //getOrCreateClientId();
     
       setInterval(function() {
           generate_dosi_ranking_report();
