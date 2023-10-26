@@ -1,3 +1,18 @@
 .dk-dosi-arcade-container {
     background: #f6d902;
 }
+
+.dk-sodi-summary-arcade-table thead tr th {
+    text-align: center;
+    font-weight: bold;
+    background-color: bisque;
+    font-size: 18px;
+}
+
+.dk-sodi-summary-arcade-table * {
+    font-size: 12px;
+}
+
+.dk_arcade_summary_score, .dk_arcade_summary_rank {
+    font-size: 20px;
+}

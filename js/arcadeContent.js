@@ -6,6 +6,7 @@
     const window = cxt.window;
     const document = cxt.document;
     const $ = cxt.$;  
+    const summary_arcade_container = "#root .page > .container";
     const arcade_container = "div:contains(My Highest Record)";
     const loading_image = "<img src='https://media.tenor.com/On7kvXhzml4AAAAj/loading-gif.gif' width='20' height='20' />";
     const storage = cxt.chrome.storage;
@@ -13,6 +14,7 @@
      
     const sync = storage.sync;
   
+    let new_container = true;
     let options = {};
     let clientId = "";
   
@@ -88,7 +90,6 @@
           },
       });
 
-
       return true;
   }
 
@@ -101,6 +102,11 @@
               if(res.myRank > 0) {
                 data = res;
                 send_dosi_game_ranking(game, data);
+              }
+                
+              if($(".dk-dosi-summary-arcade-container").length != 0) {
+                $(".dk-dosi-summary-arcade-container ."+game+"_score").html(res.myScore);
+                $(".dk-dosi-summary-arcade-container ."+game+"_rank").html(res.myRank);
               }
           })
       return data;
@@ -117,6 +123,20 @@
                 'uid': clientId,
                 'data': []
               };
+              
+              if($(".dk-dosi-summary-arcade-container").length != 0) {
+                let game_list_body = "";
+                data.forEach(async game => {
+                  let gg = game
+                  game_list_body += "<tr>"
+                                        +"<td><a target='_blank' href='https://citizen.dosi.world/arcade/game/"+gg.gameId+"/play'>"+gg.title.toUpperCase()+"</a></td>"
+                                        +"<td><span class='"+gg.gameId+"_score dk_arcade_summary_score'></span></td>"
+                                        +"<td><span class='"+gg.gameId+"_rank dk_arcade_summary_rank'></span></td>"
+                                    +"</tr>";
+                });
+                $(".dk-dosi-summary-arcade-container tbody").html(game_list_body);
+              }
+
               data.forEach(async g => {
                 let g_data = g;
                 let d = await get_dosi_game_ranking(g_data.gameId);
@@ -139,10 +159,35 @@
           .then(res => res.json())
           .then(res => {
             data = res
-            console.log(data);
             get_all_game_score();
           })
       return data;
+  }
+
+  function prepare_summary_arcade_container() {
+    if($(".dk-dosi-summary-arcade-container").length != 0) {
+      return false;
+    }
+    
+    url = window.location.href.replace(/https?:\/\//i, "");
+    
+    if(url == 'citizen.dosi.world/arcade') {
+        $(".dk-dosi-summary-arcade-container").remove();
+        $(summary_arcade_container).append("<div class='dk-dosi-summary-arcade-container'>"
+                                              +"<table class='dk-sodi-summary-arcade-table table' border='1' width='100%' cellspacing='0'>"
+                                                +"<thead>"
+                                                  +"<tr>"
+                                                    +"<th>Game</th>"
+                                                    +"<th>Score</th>"
+                                                    +"<th>My rank</th>"
+                                                  +"</tr>"
+                                                +"</thead>"
+                                                +"<tbody></tbody>"
+                                              +"</table>"
+                                          +"</div>");
+                                          
+          get_all_game_score();
+    }
   }
 
   async function getOrCreateClientId() {
@@ -158,6 +203,10 @@
 
     $(() => {
       //getOrCreateClientId();
+    
+      setInterval(function() {
+        prepare_summary_arcade_container();
+      }, 2000)
     
       setInterval(function() {
           generate_dosi_ranking_report();
