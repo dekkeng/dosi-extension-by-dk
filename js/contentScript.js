@@ -146,6 +146,9 @@ async function get_floor_price(filter, order = 'PRICE_ASC') {
         case 'roborex':
             str = "propertyIds=15342276&"
             break;
+        case 'shibainu':
+            str = "propertyIds=16633703&"
+            break;
 
         default:
             str = filter
@@ -379,6 +382,18 @@ function prepare_container() {
                     "<td align='right' class='floor'>"+loading_image+"</td>"+
                     "<td align='right' class='usd'>"+loading_image+"</td>"+
                 "</tr>"+
+                "<tr id='dk_floor_shibainu'>"+
+                    "<td align='left'>"+
+                      "<a href='https://citizen.store.dosi.world/en-US/marketplace?pageNo=1&collectibleId=2&propertyIds=16633703&category=&nftOrder=PRICE_ASC&currency=' target='_blank'>"+
+                          "Shiba Inu"+
+                      "</a>"+
+                    "</td>"+
+                    "<td align='right' class='owned'>"+loading_image+"</td>"+
+                    "<td align='right' class='selling'>"+loading_image+"</td>"+
+                    "<td align='right' class='market'>"+loading_image+"</td>"+
+                    "<td align='right' class='floor'>"+loading_image+"</td>"+
+                    "<td align='right' class='usd'>"+loading_image+"</td>"+
+                "</tr>"+
             "</tbody>"+
           "</table>");
 }
@@ -425,6 +440,7 @@ async function generate_dosi_report(url = '') {
       gen_floor_price_text(data.summary['Robo Cat'], selling.summary['Robo Cat'], "catabotica");
       gen_floor_price_text(data.summary['Cockatiel'], selling.summary['Cockatiel'], "lutino");
       gen_floor_price_text(data.summary['Robo Rex'], selling.summary['Robo Rex'], "roborex");
+      gen_floor_price_text(data.summary['Shiba Inu'], selling.summary['Shiba Inu'], "shibainu");
   }
 }
 
