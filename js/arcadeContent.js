@@ -93,7 +93,7 @@ function send_dosi_game_ranking(game, data) {
     return true;
 }
 
- async function get_dosi_game_ranking(game) {
+ async function get_dosi_game_ranking(game, challenge_list = null) {
     let data = {};
     let req = "https://citizen.dosi.world/api/citizen/v1/arcade/"+game+"/ranking";
     await fetch(req)
@@ -107,32 +107,22 @@ function send_dosi_game_ranking(game, data) {
             if($(".dk-dosi-summary-arcade-container").length != 0) {
               $(".dk-dosi-summary-arcade-container ."+game+"_score").html(res.myScore);
               $(".dk-dosi-summary-arcade-container ."+game+"_rank").html(res.myRank);
-              get_dosi_game_reward(game, res.myScore);
+              if(challenge_list) {
+                let challenge = null;
+                let don_reward = 0;
+                challenge_list.forEach(list => {
+                  if(res.myScore >= list.minScore) {
+                    challenge = list;
+                    don_reward += 1000;
+                  }
+                });
+                if(challenge) {
+                    $(".dk-dosi-summary-arcade-container ."+game+"_reward").html(don_reward+" DON (1/"+challenge.winnerCount+")");
+                }
+              }
             }
         })
     return data;
-}
-
-function get_dosi_game_reward(game, score) {
-    if($(".dk-dosi-summary-arcade-container").length != 0) {
-      let req = "https://citizen.dosi.world/api/citizen/v1/arcade/"+game;
-      fetch(req)
-        .then(res => res.json())
-        .then(res => {
-          let challenge = null;
-          let don_reward = 0;
-          res.arcadeChallengeList.forEach(list => {
-            if(score >= list.minScore) {
-              challenge = list;
-              don_reward += 1000;
-            }
-          });
-          if(challenge) {
-              $(".dk-dosi-summary-arcade-container ."+game+"_reward").html(don_reward+" DON (1/"+challenge.winnerCount+")");
-          }
-        })
-    }
-    return true;
 }
 
 function get_all_game_score() {
@@ -146,12 +136,13 @@ function get_all_game_score() {
               'uid': clientId,
               'data': []
             };
-            
+            console.log(res)
             if($(".dk-dosi-summary-arcade-container").length != 0) {
               let game_list_body = "";
               data.forEach(async game => {
                 let gg = game
                 game_list_body += "<tr>"
+                                      +"<td><a target='_blank' href='https://citizen.dosi.world/arcade/game/"+gg.gameId+"'><img class='"+gg.gameId+"_image dk_arcade_summary_image' height='50' src='"+gg.arcadeThumbnailList[1]['url']+"' /></a></td>"
                                       +"<td><a target='_blank' href='https://citizen.dosi.world/arcade/game/"+gg.gameId+"/play'>"+gg.title.toUpperCase()+"</a></td>"
                                       +"<td><span class='"+gg.gameId+"_score dk_arcade_summary_score'>-</span></td>"
                                       +"<td><span class='"+gg.gameId+"_rank dk_arcade_summary_rank'>-</span></td>"
@@ -163,7 +154,7 @@ function get_all_game_score() {
 
             data.forEach(async g => {
               let g_data = g;
-              let d = await get_dosi_game_ranking(g_data.gameId);
+              let d = await get_dosi_game_ranking(g_data.gameId, g_data.arcadeChallengeList);
               /*
               console.log(d)
               score_list.data.push({
@@ -201,6 +192,7 @@ function prepare_summary_arcade_container() {
                                             +"<table class='dk-sodi-summary-arcade-table table' border='1' width='100%' cellspacing='0'>"
                                               +"<thead>"
                                                 +"<tr>"
+                                                  +"<th></th>"
                                                   +"<th>Game</th>"
                                                   +"<th>Score</th>"
                                                   +"<th>My rank</th>"
