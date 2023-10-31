@@ -136,7 +136,6 @@ function get_all_game_score() {
               'uid': clientId,
               'data': []
             };
-            console.log(res)
             if($(".dk-dosi-summary-arcade-container").length != 0) {
               let game_list_body = "";
               data.forEach(async game => {
