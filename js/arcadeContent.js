@@ -117,7 +117,7 @@ function send_dosi_game_ranking(game, data) {
                   }
                 });
                 if(challenge) {
-                    $(".dk-dosi-summary-arcade-container ."+game+"_reward").html(don_reward+" DON (1/"+challenge.winnerCount+")");
+                    $(".dk-dosi-summary-arcade-container ."+game+"_reward").html(don_reward+" DON ("+challenge.winnerCount+")");
                 }
               }
             }
@@ -195,7 +195,7 @@ function prepare_summary_arcade_container() {
                                                   +"<th>Game</th>"
                                                   +"<th>Score</th>"
                                                   +"<th>My rank</th>"
-                                                  +"<th>DON Prize (Raffle)</th>"
+                                                  +"<th>DON Prize (Winners)</th>"
                                                 +"</tr>"
                                               +"</thead>"
                                               +"<tbody></tbody>"
