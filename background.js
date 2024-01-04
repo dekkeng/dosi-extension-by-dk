@@ -50,11 +50,12 @@
       }
       check_price = floor['price'];
     }    
-
-    if(opt['alert_type'] == -1 && check_price < opt['alert_amount']) {
-      alert_price(floor, "Floor price < "+opt['alert_amount']+ " " + opt['alert_currency']);
-    } else if(opt['alert_type'] == 1 && check_price > opt['alert_amount']) {
-      alert_price(floor, "Floor price > "+opt['alert_amount']+ " " + opt['alert_currency']);
+    if(floor['price'] > 0) {
+      if(opt['alert_type'] == -1 && check_price < opt['alert_amount']) {
+        alert_price(floor, "Floor price < "+opt['alert_amount']+ " " + opt['alert_currency']);
+      } else if(opt['alert_type'] == 1 && check_price > opt['alert_amount']) {
+        alert_price(floor, "Floor price > "+opt['alert_amount']+ " " + opt['alert_currency']);
+      }
     }
   }
 
