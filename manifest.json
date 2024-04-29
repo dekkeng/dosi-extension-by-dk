@@ -1,6 +1,6 @@
 {
     "name": "DOSI extension by DK",
-    "version": "0.0.5.5",
+    "version": "0.0.5.6",
     "description": "Extension for DOSI platform that help you analyze and summarize DOSI platform",
     "manifest_version": 3,
     "options_page": "html/options.html",
